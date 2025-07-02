@@ -1,6 +1,6 @@
 # Cookbooks
 
-A repository of curated code snippets and examples of common design patterns, features, and best practices for building powerful, context-rich applications with LangGraph and LangSmith.
+A repository of curated code snippets, notebooks and examples of common design patterns, features, and best practices for building powerful, context-rich applications with LangGraph and LangSmith.
 
 ## Repository Structure
 

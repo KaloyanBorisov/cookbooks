@@ -5,3 +5,4 @@ dotenv
 langsmith
 boto3
 openinference-instrumentation-bedrock
+ipykernel
