@@ -1,0 +1,4 @@
+langsmith
+python-dotenv
+openai
+ipykernel

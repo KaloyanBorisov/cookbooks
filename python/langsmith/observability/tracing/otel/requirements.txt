@@ -1,7 +1,7 @@
 langchain-aws
 opentelemetry-exporter-otlp
 opentelemetry-sdk
-dotenv
+python-dotenv
 langsmith
 boto3
 openinference-instrumentation-bedrock
