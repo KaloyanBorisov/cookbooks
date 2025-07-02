@@ -3,6 +3,7 @@
 A repository of curated code snippets and examples of common design patterns, features, and best practices for building powerful, context-rich applications with LangGraph and LangSmith.
 
 ## Repository Structure
+<br> 
 
 - **langgraph/**: Contains modules and examples related to LangGraph, including:
   - **architectures/**: Architectural patterns and examples.
