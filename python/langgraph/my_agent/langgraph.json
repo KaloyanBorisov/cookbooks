@@ -1,0 +1,12 @@
+{
+    "dependencies": [
+        "."
+    ],
+    "graphs": {
+        "finance-agent": {
+            "path": "./agent.py:graph",
+            "description": "Answers questions powered by finance data"
+        }
+    },
+    "env": ".env"
+}

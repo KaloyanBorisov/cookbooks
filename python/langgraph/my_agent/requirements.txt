@@ -1,0 +1,16 @@
+python-dotenv 
+typing-extensions 
+langgraph>=0.4.2
+langchain-core 
+langchain-openai 
+langchain-anthropic 
+langgraph-supervisor>=0.0.21
+langchain-community 
+scikit-learn 
+openai 
+ipython
+langgraph-sdk >= 0.1.61
+langgraph-api>=0.2.3
+langchain-community
+langchain-chroma
+beautifulsoup4
