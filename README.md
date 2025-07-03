@@ -1,7 +1,7 @@
 <!-- Logo -->
 <p align="center"><img src="assets/langchain-logo.png" alt="LangChain Logo" width="500"/></p>
 <a href="LICENSE">
-  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License"/>
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License" align="center"/>
 </a>
 
 # Cookbooks
