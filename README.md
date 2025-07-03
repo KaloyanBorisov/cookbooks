@@ -1,9 +1,13 @@
 <!-- Logo -->
 <p align="center">
-  <img src="assets/langchain-logo.png" alt="LangChain Logo" width="200"/>
+  <img src="assets/langchain-logo.png" alt="LangChain Logo" width="500"/>
 </p>
 
-This project is licensed under the [MIT License](LICENSE).
+<p align="center">
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License"/>
+  </a>
+</p>
 
 # Cookbooks
 
