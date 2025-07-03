@@ -1,6 +1,19 @@
+<!-- Logo -->
+<p align="center">
+  <img src="assets/langchain-logo.png" alt="LangChain Logo" width="200"/>
+</p>
+
+This project is licensed under the [MIT License](LICENSE).
+
 # Cookbooks
 
-A repository of curated code snippets, notebooks and examples of common design patterns, features, and best practices for building powerful, context-rich applications with LangGraph and LangSmith.
+_A curated collection of code snippets, notebooks, and best practices for building powerful, context-rich applications with LangGraph and LangSmith._
+
+## Table of Contents
+- [Cookbooks](#cookbooks)
+  - [Table of Contents](#table-of-contents)
+  - [Repository Structure](#repository-structure)
+  - [Purpose](#purpose)
 
 ## Repository Structure
 
