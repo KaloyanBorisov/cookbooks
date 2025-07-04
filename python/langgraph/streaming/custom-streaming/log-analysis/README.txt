@@ -1,5 +1,7 @@
 # Custom Streaming Log Analysis
 
+> **LangGraph Feature Demonstrated:** Custom Streaming
+
 This directory contains a streaming log analyzer that performs contextual error analysis on log files. The analyzer processes log data in chunks, scans for errors or warnings, and, if issues are detected, expands the analysis window to include surrounding context for deeper investigation.
 
 ## Features
@@ -20,11 +22,11 @@ This directory contains a streaming log analyzer that performs contextual error 
    ```bash
    python custom_streaming_log_analysis.py <log_file_path>
    ```
-   Replace `<log_file_path>` with the path to your log file (e.g., `advanced_log.log`).
+   Replace `<log_file_path>` with the path to your log file (e.g., `sample_log.log`).
 
 ## Files
 - `custom_streaming_log_analysis.py`: Main script for streaming log analysis
-- `advanced_log.log`: Example log file for testing
+- `sample_log.log`: Example log file for testing
 
 ## Requirements
 See `requirements.txt` for the list of required Python packages.
