@@ -2,7 +2,7 @@
 
 # Custom Streaming Log Analysis
 
-This directory contains a streaming log analyzer that performs contextual error analysis on log files. The analyzer processes log data in chunks, scans for errors or warnings, and, if issues are detected, expands the analysis window to include surrounding context for deeper investigation.
+A streaming log analyzer that leverages the custom streaming mode in LangGraph and performs contextual error analysis on log files. The analyzer processes log data in chunks, scans for errors or warnings, and, if issues are detected, expands the analysis window to include surrounding context for deeper investigation.
 
 ## Features
 - Processes log files in streaming fashion, chunk by chunk
