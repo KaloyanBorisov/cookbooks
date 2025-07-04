@@ -1,0 +1,13 @@
+langgraph
+langgraph-cli
+langgraph-sdk
+langgraph-checkpoint-sqlite
+langchain-community
+langchain-core
+langchain-openai
+python-dotenv
+langchain-chroma
+langgraph-cli[inmem]
+langchain-anthropic
+langchain-google-vertexai
+langchain-aws
