@@ -1,0 +1,14 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "agent": {
+      "path": "./agent.py:graph",
+      "description": "Agent with MCP authentication on user behalf"
+    }
+  },
+  "auth": {
+    "path": "./auth.py:auth",
+    "disable_studio_auth": "true"
+  },
+  "env": ".env"
+}
