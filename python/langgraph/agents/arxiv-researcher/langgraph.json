@@ -1,0 +1,14 @@
+{
+    "dependencies": [
+        "."
+    ],
+    "graphs": {
+        "arxiv_researcher": {
+            "path": "agent:app",
+            "description": "An agent that can extract arXiv URLs from user messages, fetch paper data, and generate comprehensive summaries of academic papers."
+        }
+    },
+    "env": [
+        "OPENAI_API_KEY"
+    ]
+}
