@@ -1,6 +1,7 @@
 python-dotenv
 typing-extensions
 langgraph
+langgraph-supervisor
 langchain
 langchain-core
 langchain-openai
@@ -24,3 +25,4 @@ aiohttp
 langchain-anthropic
 langgraph-cli[inmem]
 PyMuPDF
+ipykernel
