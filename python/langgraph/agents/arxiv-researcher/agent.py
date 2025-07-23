@@ -1,7 +1,7 @@
 """
 arXiv Researcher Agent
 
-This agent is responsible for downloading and parsing an arXiv paper given a URL and generating a summary report.
+This agent downloads and parses an arXiv paper given a URL and generates a summary report.
 """
 
 from utils import extract_arxiv_id, download_arxiv_pdf_text
