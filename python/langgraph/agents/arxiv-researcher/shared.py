@@ -27,5 +27,4 @@ class InputState(TypedDict):
 
 
 class OutputState(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
     final_report: str
