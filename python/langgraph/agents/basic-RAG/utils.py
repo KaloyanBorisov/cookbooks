@@ -1,5 +1,8 @@
 import os
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from pathlib import Path
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+DB_PATH = str(Path(__file__).parent / "langgraph-docs-db")
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_chroma import Chroma
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -15,38 +18,35 @@ embedding_model = OpenAIEmbeddings()
 
 # NOTE: Add the documentation you want to perform RAG over
 LANGGRAPH_DOCS = [
-    "https://langchain-ai.github.io/langgraph/",
-    "https://langchain-ai.github.io/langgraph/tutorials/customer-support/customer-support/",
-    "https://langchain-ai.github.io/langgraph/tutorials/chatbots/information-gather-prompting/",
-    "https://langchain-ai.github.io/langgraph/tutorials/code_assistant/langgraph_code_assistant/",
-    "https://langchain-ai.github.io/langgraph/tutorials/multi_agent/multi-agent-collaboration/",
-    "https://langchain-ai.github.io/langgraph/tutorials/multi_agent/agent_supervisor/",
-    "https://langchain-ai.github.io/langgraph/tutorials/multi_agent/hierarchical_agent_teams/",
-    "https://langchain-ai.github.io/langgraph/tutorials/plan-and-execute/plan-and-execute/",
-    "https://langchain-ai.github.io/langgraph/tutorials/rewoo/rewoo/",
-    "https://langchain-ai.github.io/langgraph/tutorials/llm-compiler/LLMCompiler/",
-    "https://langchain-ai.github.io/langgraph/concepts/high_level/",
-    "https://langchain-ai.github.io/langgraph/concepts/low_level/",
-    "https://langchain-ai.github.io/langgraph/concepts/agentic_concepts/",
-    "https://langchain-ai.github.io/langgraph/concepts/human_in_the_loop/",
-    "https://langchain-ai.github.io/langgraph/concepts/multi_agent/",
-    "https://langchain-ai.github.io/langgraph/concepts/persistence/",
-    "https://langchain-ai.github.io/langgraph/concepts/streaming/",
-    "https://langchain-ai.github.io/langgraph/concepts/faq/",
+    "https://docs.langchain.com/oss/python/langgraph/overview",
+    "https://docs.langchain.com/oss/python/langgraph/quickstart",
+    "https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph",
+    "https://docs.langchain.com/oss/python/langgraph/workflows-agents",
+    "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+    "https://docs.langchain.com/oss/python/langgraph/persistence",
+    "https://docs.langchain.com/oss/python/langgraph/streaming",
+    "https://docs.langchain.com/oss/python/langgraph/add-memory",
+    "https://docs.langchain.com/oss/python/langgraph/interrupts",
+    "https://docs.langchain.com/oss/python/langgraph/durable-execution",
 ]
 
 
 # NOTE: Define a retriever
 def get_langgraph_docs_retriever():
     # If there is a vectorstore at this path, early return as it is already persisted
-    if os.path.exists("langgraph-docs-db"):
-        print("Loading vectorstore from disk...")
+    if os.path.exists(DB_PATH):
         vectorstore = Chroma(
             collection_name="langgraph-docs",
             embedding_function=embedding_model,
-            persist_directory="langgraph-docs-db",
+            persist_directory=DB_PATH,
         )
-        return vectorstore.as_retriever(lambda_mult=0)
+        count = vectorstore._collection.count()
+        if count > 0:
+            print(f"Loading vectorstore from disk ({count} embeddings)...")
+            return vectorstore.as_retriever(lambda_mult=0)
+        print("Vectorstore exists but is empty, rebuilding...")
+        import shutil
+        shutil.rmtree(DB_PATH)
 
     # Otherwise, load the documents and persist to the vectorstore
     docs = [WebBaseLoader(url).load() for url in LANGGRAPH_DOCS]
@@ -58,7 +58,7 @@ def get_langgraph_docs_retriever():
     vectorstore = Chroma(
         collection_name="langgraph-docs",
         embedding_function=embedding_model,
-        persist_directory="langgraph-docs-db",
+        persist_directory=DB_PATH,
     )
     vectorstore.add_documents(doc_splits)
     print("Vectorstore created and persisted to disk")

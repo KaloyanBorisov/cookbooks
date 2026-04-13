@@ -1,5 +1,21 @@
+from dotenv import load_dotenv
+load_dotenv()
+
+import os
+os.environ.setdefault("USER_AGENT", "basic-RAG/1.0")
+
+from phoenix.otel import register
+from openinference.instrumentation.langchain import LangChainInstrumentor
+
+tracer_provider = register(
+    project_name="basic-RAG",
+    endpoint=os.environ["PHOENIX_COLLECTOR_ENDPOINT"] + "/v1/traces",
+    headers={"api_key": os.environ["PHOENIX_API_KEY"]},
+)
+LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+
 from utils import get_langgraph_docs_retriever, llm
-from langchain.schema import Document
+from langchain_core.documents import Document
 from typing import List
 from typing_extensions import TypedDict
 from langgraph.graph import StateGraph, START, END
@@ -68,7 +84,7 @@ def generate_response(state: GraphState):
     return {"generation": generation}
 
 
-graph_builder = StateGraph(GraphState, input=InputState)
+graph_builder = StateGraph(GraphState, input_schema=InputState)
 graph_builder.add_node("retrieve_documents", retrieve_documents)
 graph_builder.add_node("generate_response", generate_response)
 graph_builder.add_edge(START, "retrieve_documents")
@@ -76,3 +92,7 @@ graph_builder.add_edge("retrieve_documents", "generate_response")
 graph_builder.add_edge("generate_response", END)
 
 graph = graph_builder.compile()
+
+if __name__ == "__main__":
+    result = graph.invoke({"question": "How does LangGraph handle persistence and checkpointing in multi-agent workflows?"})
+    print("\nAnswer:", result["generation"].content)

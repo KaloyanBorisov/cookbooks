@@ -11,3 +11,5 @@ langgraph-cli[inmem]
 langchain-anthropic
 langchain-google-vertexai
 langchain-aws
+arize-phoenix-otel
+openinference-instrumentation-langchain
