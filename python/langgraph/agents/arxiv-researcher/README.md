@@ -96,15 +96,34 @@ LANGSMITH_ENDPOINT=https://api.smith.langchain.com
 
 ### LangGraph Studio (recommended)
 
+`langgraph dev` starts a local development server and opens LangGraph Studio — a visual interface for running and debugging your graph interactively.
+
+**What it does:**
+- Reads `langgraph.json` to find your graph (`agent:app`) and `.env` file
+- Starts a local API server on `http://127.0.0.1:2024`
+- Opens Studio at `https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024` — a remote UI that talks to your local server
+
+**Start the server:**
 ```bash
+cd python/langgraph/agents/arxiv-researcher
 langgraph dev
 ```
 
-Open the Studio URL printed in the terminal, then send a message with an arXiv URL:
+**Open Studio** — copy the URL printed in the terminal into your browser (on Windows/WSL2 use your Windows browser).
 
+**Send a test message** with an arXiv URL, for example:
 ```
 https://arxiv.org/abs/1706.03762
 ```
+
+**Watch the graph execute** — each node lights up in the graph panel as it runs. Click any node to inspect its input/output state.
+
+**Stop the server:**
+```bash
+kill -9 $(lsof -i :2024 -t)
+```
+
+> **Note:** On WSL2 (Ubuntu on Windows), `langgraph dev` cannot open a browser automatically. Copy the Studio URL from the terminal output and open it in your Windows browser manually.
 
 ### Programmatically
 
