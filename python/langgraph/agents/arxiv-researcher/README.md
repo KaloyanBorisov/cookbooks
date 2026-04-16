@@ -145,6 +145,18 @@ asyncio.run(main())
 
 LangSmith tracing is enabled automatically via environment variables — no code changes required. Set `LANGSMITH_API_KEY` and `LANGSMITH_TRACING=true` in your `.env` and all LLM calls and graph node executions will appear in your LangSmith project dashboard.
 
+## Potential Improvements
+
+| # | Improvement | Description |
+|---|---|---|
+| 1 | **Error handling & retries** | If PDF download fails the graph silently stops. Add retry logic in `utils.py` and surface errors clearly in the final report. |
+| 2 | **Multiple papers in one message** | Extract multiple arXiv URLs from a single message, process them in parallel, and produce a comparative report. |
+| 3 | **Streaming output** | The final report only appears after all three agents finish (~30-60s). Stream each summary as it completes instead of waiting for all three. |
+| 4 | **PDF caching** | Every run re-downloads the same PDF. A simple file-based cache keyed by arXiv ID avoids redundant network calls. |
+| 5 | **Paper comparison mode** | Given two papers, produce a diff-style report — what's similar, what's different, which approach is stronger. Useful for literature reviews. |
+| 6 | **Citation extraction** | Parse the references section, extract cited paper IDs, and optionally fetch and summarize them recursively. |
+| 7 | **Switch to Claude** | Claude handles long documents better and has a larger context window than `o3-mini` — useful for dense academic papers. Replace `ChatOpenAI` in `shared.py` with `ChatAnthropic`. |
+
 ## Requirements
 
 - Python 3.8+
