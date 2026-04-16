@@ -1,2 +1,3 @@
 .env
 .DS_Store
+python/langgraph/agents/arxiv-researcher/.env.example

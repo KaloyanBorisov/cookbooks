@@ -18,7 +18,14 @@ async def extract_id_node(state: State):
     user_message = ""
     for message in state["messages"]:
         if isinstance(message, HumanMessage):
-            user_message = message.content
+            content = message.content
+            if isinstance(content, list):
+                user_message = " ".join(
+                    part["text"] if isinstance(part, dict) else str(part)
+                    for part in content
+                )
+            else:
+                user_message = content
             break
 
     try:
@@ -75,7 +82,7 @@ def aggregate(state: State):
         {state.get("applications", "")}
         """
 
-    return {"final_report": final_report}
+    return {"final_report": final_report, "messages": [AIMessage(content=final_report)]}
 
 
 async def run_high_level_summary(state: State):
@@ -96,7 +103,7 @@ async def run_applications(state: State):
     return {"applications": result["applications"]}
 
 
-workflow = StateGraph(State, input=InputState, output=OutputState)
+workflow = StateGraph(State, input_schema=InputState, output_schema=OutputState)
 
 # Add all nodes
 workflow.add_node("extract_id", extract_id_node)
