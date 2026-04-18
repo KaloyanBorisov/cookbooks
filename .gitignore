@@ -1,3 +1,6 @@
 .env
 .DS_Store
 python/langgraph/agents/arxiv-researcher/.env.example
+.langgraph_api/
+*.pckl
+*.db

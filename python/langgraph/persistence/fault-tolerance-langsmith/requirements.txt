@@ -1,6 +1,7 @@
 python-dotenv
 typing-extensions
 langgraph
+langgraph-cli[inmem]
 langchain-core
 langchain-openai
 openai

@@ -1,8 +1,5 @@
 .env
-__pycache__/
-.venv/
-.claude
-uv.lock
-.langgraph_api/
-*.pckl
 *.db
+__pycache__/
+*.pyc
+.langgraph_api/

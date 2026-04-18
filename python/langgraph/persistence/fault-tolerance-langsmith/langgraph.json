@@ -1,0 +1,8 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "partial_failure": "./agents/partial_failure_agent.py:graph",
+    "retry": "./agents/retry_agent.py:graph"
+  },
+  "env": ".env"
+}
