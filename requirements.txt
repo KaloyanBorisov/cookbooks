@@ -1,0 +1,13 @@
+httpx
+streamlit
+langchain
+langchain-community
+langchain-core
+langchainhub
+google-generativeai
+langchain-google-genai
+langgraph
+tiktoken
+faiss-cpu
+duckduckgo_search
+pymupdf
