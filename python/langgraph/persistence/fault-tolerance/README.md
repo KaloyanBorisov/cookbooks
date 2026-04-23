@@ -87,6 +87,63 @@ class State(TypedDict):
 - **Unique thread IDs** isolate different execution contexts
 - **Pending writes** stored separately until all parallel nodes complete
 
+## When to Use Each Resilience Pattern
+
+### Use `RetryPolicy` when...
+
+The failure is **transient and fast to recover** — API rate limits, network timeouts, LLM provider blips:
+
+```python
+from langgraph.types import RetryPolicy
+
+builder.add_node("call_llm", call_llm, retry=RetryPolicy(
+    max_attempts=5,
+    retry_on=openai.RateLimitError
+))
+```
+
+Retries happen **within the same execution**, in memory. No checkpointer needed. If the process crashes mid-retry, those retries are lost.
+
+### Use checkpointer + `graph.invoke(None, cfg)` when...
+
+The failure is **infrastructure-level or long-running** — process crash, long pipelines, human intervention needed, or parallel branches where one succeeds and one fails (this demo's case):
+
+```python
+graph = builder.compile(checkpointer=MemorySaver())
+
+try:
+    graph.invoke(state, cfg)
+except Exception:
+    pass  # progress is saved in checkpoint
+
+# Resume later — even after a process restart if using Postgres/SQLite
+graph.invoke(None, cfg)
+```
+
+### Use **both together** for maximum resilience
+
+```python
+builder.add_node(
+    "call_external_api",
+    call_external_api,
+    retry=RetryPolicy(max_attempts=3)  # handles transient blips
+)
+graph = builder.compile(checkpointer=checkpointer)  # handles crashes
+```
+
+`RetryPolicy` silently handles fast transient errors. If all retries are exhausted and the node still fails, the checkpointer saves progress so you can resume from that checkpoint later.
+
+### Decision guide
+
+| Scenario | Pattern |
+|---|---|
+| API timeout / rate limit | `RetryPolicy` |
+| Process crash mid-pipeline | Checkpointer + resume |
+| Parallel branch partial failure | Checkpointer + pending writes (this demo) |
+| Long job (>minutes) | Checkpointer + resume |
+| Human approval before continuing | Checkpointer + `interrupt` |
+| Transient + crash resilience | Both together |
+
 ## Real-World Applications
 
 ### Partial Failure Pattern
