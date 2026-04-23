@@ -144,6 +144,58 @@ graph = builder.compile(checkpointer=checkpointer)  # handles crashes
 | Human approval before continuing | Checkpointer + `interrupt` |
 | Transient + crash resilience | Both together |
 
+## Checkpointer Use Cases in Practice
+
+### Use Case 1 — Human-in-the-Loop Approval
+
+![Human-in-the-loop flow](assets/case1_human_in_the_loop.png)
+
+A node calls `interrupt()` to pause execution mid-graph and surface a decision to a human. The checkpointer saves all state at that point. When the human responds (minutes or days later), `graph.invoke(Command(resume=decision), cfg)` restores the checkpoint and continues from exactly where it stopped — no recomputation of earlier nodes.
+
+**When to use:** Any workflow requiring human sign-off before a consequential action (send email, execute trade, deploy to prod).
+
+---
+
+### Use Case 2 — Multi-Session Memory with Postgres
+
+![Multi-session Postgres memory](assets/case2_postgres_memory.png)
+
+`AsyncPostgresSaver` persists the full conversation state to a Postgres table keyed by `thread_id`. A second session (different process, different day) loads the same `thread_id` and resumes with full prior context — no external vector store needed for conversation history.
+
+**When to use:** Customer support bots, long-running assistants, or any agent that must remember prior sessions across restarts.
+
+---
+
+### Use Case 3 — Mental Health Companion Lifecycle
+
+![Mental health companion state machine](assets/case3_mental_health.png)
+
+A companion agent progresses through states (NewUser → ActiveSession → Checkpointed → Dormant → Escalated). Each state transition is checkpointed so the agent can resume a conversation after days of inactivity and recognise when to escalate to a human therapist — without losing the user's history.
+
+**When to use:** Sensitive long-running applications where continuity of context and graceful escalation to humans are both required.
+
+---
+
+### Use Case 4 — Time-Travel Debugging
+
+![Time-travel debugging timeline](assets/case4_time_travel.png)
+
+`graph.get_state_history(cfg)` lists every checkpoint ever created for a thread. You can rewind to any prior checkpoint and re-invoke the graph with a corrected state or different inputs — the original "bad" branch is preserved, and a new branch forks from the rewind point.
+
+**When to use:** Development and debugging of long pipelines, A/B testing alternative prompt strategies, or correcting a mistake in a multi-step agentic workflow without restarting from scratch.
+
+---
+
+### Use Case 5 — Parallel Branch Partial Failure (this demo)
+
+![Parallel branch pending writes](assets/case5_pending_writes.png)
+
+When two nodes run in parallel and one fails, LangGraph stores the successful node's output as a "pending write" in the checkpoint. On resume, the pending write is replayed and only the failed node re-executes — the successful node is skipped entirely. Both writes are merged atomically at the convergence point.
+
+**When to use:** Fan-out/fan-in graphs, multi-agent pipelines, or any workflow with parallel branches where re-running successful (and potentially expensive) nodes would be wasteful.
+
+---
+
 ## Real-World Applications
 
 ### Partial Failure Pattern
