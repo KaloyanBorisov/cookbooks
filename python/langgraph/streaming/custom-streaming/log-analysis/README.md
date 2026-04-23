@@ -151,6 +151,53 @@ The buffer is populated **before** the graph runs for each chunk, so the context
 
 ---
 
+### The LangGraph Runtime
+
+When you call `workflow.compile()`, LangGraph builds an internal engine — the **runtime**. You never see it directly in the code, but it is always running behind the scenes. It is responsible for:
+
+1. Knowing the graph structure (which nodes exist, which edges connect them)
+2. Managing the `State` dict — merging each node's return value into it after the node finishes
+3. Calling nodes in the right order
+4. Calling the routing function after conditional nodes
+5. Managing the async event queue that `astream()` reads from
+
+**Nodes never call each other.** Each node just returns a dict. The runtime takes that dict, merges it into state, then asks the router "what's next?" — and only then calls the next node.
+
+So the internal call sequence is always:
+
+```
+runtime → node → runtime → router → runtime → node → runtime → END
+```
+
+Never `node → node` directly.
+
+**Concrete example — chunk 3 has an error:**
+
+```
+runtime calls error_scan(state, config)
+│
+├── writer({"type": "progress", "stage": "error_scan", "chunk": 3})   ← instant push
+├── await self.llm.ainvoke(...)                                        ← waits for LLM
+├── LLM returns "ERROR_FOUND"
+├── writer({"type": "error_detected", "chunk": 3})                    ← instant push
+└── return {"stage": "deep_analysis", ...}                            ← node done
+
+runtime merges return value into State
+runtime calls route_after_scan(state)  →  returns "deep_analysis"
+runtime calls deep_contextual_analysis(state, config)
+│
+├── writer({"type": "progress", "stage": "deep_analysis", "chunk": 3})
+├── await self.llm.ainvoke(...)
+├── writer({"type": "detailed_analysis", "content": "..."})
+└── return {"stage": "complete", ...}
+
+runtime sees no more edges → END
+```
+
+Think of it like a web framework: you define route handlers, but Flask/FastAPI decides when to call them based on incoming requests. Here, nodes are the handlers and the LangGraph runtime is the framework deciding when to invoke them based on state.
+
+---
+
 ### Extending to Real-Time Log Analysis
 
 This architecture maps directly to live log streaming. The only change needed is the input source:
