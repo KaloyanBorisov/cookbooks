@@ -1,12 +1,10 @@
 import os
-import uuid
-
 os.environ.setdefault("USER_AGENT", "Phoenix-RAG-Agent")
 
 import gradio as gr
 from agent import construct_agent, initialize_agent_llm, initialize_instrumentor
 from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from openinference.instrumentation import using_session
 from opentelemetry.trace import get_tracer_provider
 from rag import initialize_vector_store
@@ -22,6 +20,21 @@ SYSTEM_MESSAGE_FOR_AGENT_WORKFLOW = """
     4. You can use the `analyze_rag_response` tool if the user asks you to analyze or evaluate a RAG response.
     Your goal is to ensure the user's query is addressed with quality using the retrieved information. If further clarification is required, you can request additional input from the user.
     """
+
+
+def load_chat_history(agent, session_id):
+    config = {"configurable": {"thread_id": session_id}}
+    state = agent.get_state(config)
+    if not state or not state.values:
+        return []
+    messages = state.values.get("messages", [])
+    history = []
+    for msg in messages:
+        if isinstance(msg, HumanMessage):
+            history.append({"role": "user", "content": msg.content})
+        elif isinstance(msg, AIMessage) and msg.content:
+            history.append({"role": "assistant", "content": msg.content})
+    return history
 
 
 def initialize_agent(
@@ -45,11 +58,14 @@ def initialize_agent(
     tool_model = initialize_tool_llm("gpt-4o-mini")
     initialize_vector_store(vector_source_web_url)
     copilot_agent = construct_agent()
+    chat_history = load_chat_history(copilot_agent, user_session_id)
     return (
         copilot_agent,
         tool_model,
         user_session_id,
-        (f"Configuration Set: Project '{project_name}' is Ready!"),
+        f"Configuration Set: Project '{project_name}' is Ready!",
+        chat_history,
+        chat_history,
     )
 
 
@@ -62,7 +78,16 @@ def chat_with_agent(
     conversation_history,
 ):
     if not copilot_agent:
-        return "Error: RAG Agent is not initialized. Please set API keys first."
+        if user_chat_history is None:
+            user_chat_history = []
+        return (
+            None,
+            "",
+            user_chat_history,
+            user_session_id,
+            user_chat_history,
+            conversation_history,
+        )
     if not conversation_history:
         messages = [SystemMessage(content=SYSTEM_MESSAGE_FOR_AGENT_WORKFLOW)]
     else:
@@ -102,7 +127,7 @@ with gr.Blocks() as demo:
     agent = gr.State(None)
     openai_tool_model = gr.State(None)
     history = gr.State({})  # State to maintain the message history as a list of tuples
-    session_id = gr.State(str(uuid.uuid4()))
+    session_id = gr.State("default-session")
     chat_history = gr.State([])
     gr.Markdown("## Chat with RAG Agent 🔥")
 
@@ -132,19 +157,6 @@ with gr.Blocks() as demo:
             set_button = gr.Button("Set API Keys & Initialize")
             output_message = gr.Textbox(label="Status", interactive=False)
 
-            set_button.click(
-                fn=initialize_agent,
-                inputs=[
-                    phoenix_input,
-                    project_input,
-                    openai_input,
-                    session_id,
-                    web_url,
-                    phoenix_endpoint,
-                ],
-                outputs=[agent, openai_tool_model, session_id, output_message],
-            )
-
         with gr.Column(scale=4):
             gr.Markdown("### Chat with RAG Agent 💬")
 
@@ -166,6 +178,19 @@ with gr.Blocks() as demo:
                 outputs=[agent, user_input, chat_display, session_id, chat_history, history],
             )
 
+        set_button.click(
+            fn=initialize_agent,
+            inputs=[
+                phoenix_input,
+                project_input,
+                openai_input,
+                session_id,
+                web_url,
+                phoenix_endpoint,
+            ],
+            outputs=[agent, openai_tool_model, session_id, output_message, chat_display, chat_history],
+        )
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 7860))
+    port = int(os.environ.get("PORT", 8080))
     demo.launch(share=True, server_name="0.0.0.0", server_port=port)

@@ -1,0 +1,17 @@
+{
+    "dependencies": [
+        "."
+    ],
+    "graphs": {
+        "agentic_rag": {
+            "path": "agent:graph",
+            "description": "An agentic RAG assistant that uses a ReAct loop to retrieve information from a vector store, search the web via DuckDuckGo, and analyze response quality."
+        }
+    },
+    "env": [
+        "OPENAI_API_KEY",
+        "LANGCHAIN_API_KEY",
+        "LANGCHAIN_TRACING_V2",
+        "LANGCHAIN_PROJECT"
+    ]
+}

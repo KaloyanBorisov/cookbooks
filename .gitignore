@@ -3,4 +3,11 @@
 python/langgraph/agents/arxiv-researcher/.env.example
 .langgraph_api/
 *.pckl
-*.db
+*.db.claude/
+retry_checkpoints.db
+checkpoints.db
+.claude/settings.json
+.gradio/certificate.pem
+__pycache__/
+*.pyc
+*.pyo

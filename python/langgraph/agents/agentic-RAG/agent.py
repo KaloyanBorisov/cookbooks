@@ -4,7 +4,9 @@ import time
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
-from langgraph.checkpoint.memory import MemorySaver
+import sqlite3
+
+from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
 from loguru import logger
@@ -84,10 +86,7 @@ def call_llm(state):
     return {"messages": [response]}
 
 
-def construct_agent():
-    """
-    This function will construct the agent workflow. It will include the all the nodes in agent workflow.
-    """
+def build_workflow():
     tool_node = ToolNode([create_rag_response, analyze_rag_response, web_search])
 
     workflow = StateGraph(MessagesState)
@@ -96,11 +95,20 @@ def construct_agent():
     workflow.add_node("user_input", user_input)
 
     workflow.add_edge(START, "agent")
-    workflow.add_conditional_edges("agent", router)
+    workflow.add_conditional_edges("agent", router, {"tools": "tools", "agent": "agent", END: END})
     workflow.add_edge("tools", "agent")
-    workflow.add_conditional_edges("user_input", router)
-    checkpointer = MemorySaver()
-    return workflow.compile(checkpointer=checkpointer)
+    workflow.add_conditional_edges("user_input", router, {"tools": "tools", "agent": "agent", END: END})
+    return workflow
+
+
+def construct_agent():
+    """
+    This function will construct the agent workflow. It will include the all the nodes in agent workflow.
+    """
+    db_path = os.path.join(os.path.dirname(__file__), "checkpoints.db")
+    conn = sqlite3.connect(db_path, check_same_thread=False)
+    checkpointer = SqliteSaver(conn)
+    return build_workflow().compile(checkpointer=checkpointer)
 
 
 def main():
@@ -135,6 +143,8 @@ def main():
         config={"configurable": {"thread_id": int(time.time())}},
     )
 
+
+graph = build_workflow().compile()
 
 if __name__ == "__main__":
     print("Main Started.....")

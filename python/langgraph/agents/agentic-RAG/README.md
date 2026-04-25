@@ -38,6 +38,10 @@ This folder contains examples for building a Retrieval-Augmented Generation (RAG
 * `rag.py`: Contains functions for initializing and using the RAG vector store
 * `requirements.txt`: Lists the required libraries for the project
 
+## Graph
+
+![LangGraph Agent Graph](graph.png)
+
 ## Architecture
 
 ```mermaid

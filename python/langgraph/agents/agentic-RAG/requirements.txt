@@ -1,5 +1,4 @@
 arize-phoenix
-arize-phoenix-evals
 arize-phoenix-otel
 beautifulsoup4==4.12.3
 ddgs
@@ -10,9 +9,7 @@ langchain-openai>=1.0.0
 langchain-text-splitters>=1.1.1
 langgraph>=1.0.0
 loguru==0.7.2
-pandas==2.2.3
 python-dotenv==1.0.1
-tqdm==4.66.6
 gradio
 openinference-instrumentation-openai
 openinference-instrumentation-langchain
