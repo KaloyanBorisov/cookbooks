@@ -5,3 +5,4 @@
 checkpoints.*
 retry_checkpoints.*
 retry_checkpoints.db
+.venv

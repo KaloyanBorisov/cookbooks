@@ -105,15 +105,28 @@ Both models can be swapped for any LangChain-compatible provider.
 ## Setup
 
 ### Prerequisites
-- Python 3.10+
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/) — fast Python package manager (recommended)
 - A [Google AI Studio](https://aistudio.google.com) API key (free tier available)
 - A [LangSmith](https://smith.langchain.com) API key (free tier available, for tracing)
+
+### Install uv
+
+```bash
+pip install uv
+# or via the official installer:
+curl -Ls https://astral.sh/uv/install.sh | sh
+```
 
 ### Local
 
 ```bash
+# Create virtual environment
+uv venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 
 # Configure secrets
 cat > .streamlit/secrets.toml <<EOF
@@ -125,6 +138,8 @@ EOF
 # Run
 streamlit run streamlit_app.py
 ```
+
+> **Why uv?** `uv` caches compiled wheels globally (`~/.cache/uv/`) and hard-links them into each project's venv. Installing from a warm cache takes ~1s instead of ~60s with pip. Each project remains fully isolated — different versions across projects are supported.
 
 ### Docker
 

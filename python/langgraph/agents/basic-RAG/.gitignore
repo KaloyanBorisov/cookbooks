@@ -2,3 +2,4 @@
 langgraph-docs-db/
 __pycache__/
 *.pyc
+.venv
