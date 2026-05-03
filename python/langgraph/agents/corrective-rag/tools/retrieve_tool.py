@@ -1,9 +1,9 @@
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import Chroma
 from models.EM import embedding
+
+CHROMA_DIR = "index/chroma"
 
 
 def retriever():
-    vectorstore = FAISS.load_local(
-        folder_path="index", embeddings=embedding, allow_dangerous_deserialization=True
-    )
+    vectorstore = Chroma(persist_directory=CHROMA_DIR, embedding_function=embedding)
     return vectorstore.as_retriever(search_kwargs={"k": 3})

@@ -1,6 +1,15 @@
+import os
+import warnings
 import streamlit as st
+
+warnings.filterwarnings("ignore", message="authlib.jose module is deprecated")
+
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]
+os.environ["LANGCHAIN_PROJECT"] = st.secrets["LANGCHAIN_PROJECT"]
+
 from models.LLM import llm
-from tools.index_tool import indexer
+from tools.index_tool import indexer, list_indexed_docs
 from graph import workflow_compiler
 
 st.set_page_config(page_title="Assistant", layout="centered")
@@ -28,14 +37,37 @@ st.markdown(
     "<h1 style='text-align: center; color: #aed0ab;'>Corrective-RAG</h1> <br>",
     unsafe_allow_html=True,
 )
-indexed = False
+import tempfile
+
+indexed = os.path.exists("index/chroma")
+app = workflow_compiler() if indexed else None
+
+indexed_docs = list_indexed_docs()
+if indexed_docs:
+    st.markdown("**Indexed documents:**")
+    for doc in indexed_docs:
+        st.markdown(f"- {doc}")
+
 uploaded_file = st.file_uploader("Choose a PDF file", type=["pdf"])
+replace_doc = st.selectbox(
+    "Replace an existing document (optional)",
+    options=["— add as new —"] + indexed_docs,
+) if indexed_docs else None
+replace_doc = replace_doc if replace_doc and replace_doc != "— add as new —" else None
+
 if uploaded_file:
-    temp_file = f"./{uploaded_file.name}"
-    with open(temp_file, "wb") as file:
-        file.write(uploaded_file.getvalue())
-        file_name = uploaded_file.name
-    indexer(temp_file)
+    already_indexed = (
+        st.session_state.get("indexed_file") == uploaded_file.name
+        and indexed
+        and replace_doc is None
+    )
+    if not already_indexed:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(uploaded_file.getvalue())
+            tmp_path = tmp.name
+        indexer(tmp_path, filename=uploaded_file.name, replace_doc=replace_doc)
+        os.unlink(tmp_path)
+        st.session_state["indexed_file"] = uploaded_file.name
     app = workflow_compiler()
     indexed = True
 

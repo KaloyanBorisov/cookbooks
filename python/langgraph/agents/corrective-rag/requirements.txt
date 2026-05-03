@@ -11,3 +11,6 @@ tiktoken
 faiss-cpu
 duckduckgo_search
 pymupdf
+langchain-experimental
+langsmith
+chromadb

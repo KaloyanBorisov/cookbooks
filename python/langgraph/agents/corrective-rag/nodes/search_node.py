@@ -1,5 +1,5 @@
 from tools.search_tool import web_search_tool
-from langchain.schema import Document
+from langchain_core.documents import Document
 
 
 def web_search(state):
