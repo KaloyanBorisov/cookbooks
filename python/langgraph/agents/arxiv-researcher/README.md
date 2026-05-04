@@ -68,6 +68,8 @@ arxiv-researcher/
 ├── prompts/
 │   └── prompts.py        # Prompt templates for all three agents
 ├── langgraph.json        # LangGraph server configuration
+├── Dockerfile            # Container image definition
+├── docker-compose.yml    # Named volume mount for live source sync
 └── requirements.txt      # Python dependencies
 ```
 
@@ -94,7 +96,36 @@ LANGSMITH_ENDPOINT=https://api.smith.langchain.com
 
 ## Usage
 
-### LangGraph Studio (recommended)
+### Docker (recommended for consistent environments)
+
+The project includes a `docker-compose.yml` with a named volume (`arxiv-researcher-src`) that bind-mounts the local source directory into the container. This means file edits on the host are instantly visible inside the container, and `langgraph dev` hot-reload works as if running locally.
+
+**Build and start:**
+```bash
+cd python/langgraph/agents/arxiv-researcher
+docker compose up -d
+```
+
+**Open LangGraph Studio** — connect to the containerized server:
+```
+https://smith.langchain.com/studio/?baseUrl=http://localhost:9091
+```
+
+**Stop:**
+```bash
+docker compose down
+```
+
+**Rebuild after dependency changes** (e.g. updated `requirements.txt`):
+```bash
+docker compose up -d --build
+```
+
+> **Note:** The named volume `arxiv-researcher-src` uses a bind mount — only source code changes are live. Dependency changes always require a rebuild.
+
+---
+
+### LangGraph Studio (local)
 
 `langgraph dev` starts a local development server and opens LangGraph Studio — a visual interface for running and debugging your graph interactively.
 

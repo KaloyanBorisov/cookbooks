@@ -8,8 +8,9 @@ langchain-core>=1.0.0
 langchain-openai>=1.0.0
 langchain-text-splitters>=1.1.1
 langgraph>=1.0.0
+langgraph-checkpoint-sqlite
 loguru==0.7.2
-python-dotenv==1.0.1
+python-dotenv
 gradio
 openinference-instrumentation-openai
 openinference-instrumentation-langchain

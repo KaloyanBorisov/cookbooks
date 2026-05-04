@@ -1,0 +1,16 @@
+services:
+  arxiv-researcher:
+    build: .
+    container_name: arxiv-researcher
+    ports:
+      - "9091:8123"
+    volumes:
+      - arxiv-researcher-src:/app
+
+volumes:
+  arxiv-researcher-src:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: .

@@ -12,8 +12,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 8080
+EXPOSE 9090
 
-HEALTHCHECK CMD curl --fail http://localhost:8080/ || exit 1
-
-ENTRYPOINT ["python", "app.py"]
+ENTRYPOINT ["python", "-u", "app.py"]

@@ -12,6 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+VOLUME ["/app"]
+
 EXPOSE 8123
 
 HEALTHCHECK CMD curl --fail http://localhost:8123/ok || exit 1

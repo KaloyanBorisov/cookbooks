@@ -10,7 +10,6 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
 from loguru import logger
-from phoenix.otel import register
 from rag import initialize_vector_store
 from tools import analyze_rag_response, create_rag_response, initialize_tool_llm, web_search
 
@@ -22,6 +21,7 @@ def initialize_instrumentor(project_name, endpoint=None):
     """
     Initialize the OpenAIInstrumentor, so all the llm calls are instrumented
     """
+    from phoenix.otel import register
     from openinference.instrumentation.langchain import LangChainInstrumentor
 
     tracer_provider = register(
