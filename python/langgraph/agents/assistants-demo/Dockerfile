@@ -16,4 +16,4 @@ EXPOSE 8123
 
 HEALTHCHECK CMD curl --fail http://localhost:8123/ok || exit 1
 
-ENTRYPOINT ["langgraph", "dev", "--host", "0.0.0.0", "--port", "8123"]
+ENTRYPOINT ["langgraph", "dev", "--host", "0.0.0.0", "--port", "8123", "--no-browser"]
