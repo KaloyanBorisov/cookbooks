@@ -1,0 +1,14 @@
+{
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--no-sandbox"
+      ],
+      "transport": "stdio",
+      "description": "Use for browser based interaction or automation tasks"
+    }
+  }
+
+
+  
