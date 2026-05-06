@@ -16,56 +16,7 @@ A LangGraph-based ReAct agent that connects to any [Model Context Protocol (MCP)
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    User([User]) -->|message| Studio[LangGraph Studio\nlocalhost:2024]
-    Studio --> OuterGraph
-
-    subgraph OuterGraph["Outer StateGraph"]
-        direction TB
-        START([__start__]) --> call_model
-        call_model --> END([__end__])
-    end
-
-    subgraph call_model["call_model node"]
-        direction TB
-        Config[Load Configuration\nsystem_prompt · mcp_tools path] --> LoadMCP
-        LoadMCP[Load mcp_config.json] --> PerServer
-
-        subgraph PerServer["Per-server loop (isolated try/except)"]
-            direction LR
-            Brave[brave-search\nbrave_web_search\nbrave_local_search]
-            Hyper[hyperbrowser\nscrape · crawl\nextract · browser_use]
-        end
-
-        PerServer --> Merge[Merge MCP tools + Tavily]
-        Merge --> ReAct
-
-        subgraph ReAct["Inner ReAct Agent (create_react_agent)"]
-            direction TB
-            GPT[GPT-4o] -->|tool_call| Tools[MCP Tools + Tavily]
-            Tools -->|tool_result| GPT
-            GPT -->|final answer| Reply[AIMessage]
-        end
-    end
-
-    subgraph Docker["Docker Container"]
-        OuterGraph
-        Brave
-        Hyper
-    end
-
-    subgraph MCPServers["MCP Subprocesses (stdio)"]
-        BraveProc[mcp-server-brave-search]
-        HyperProc[hyperbrowser-mcp]
-    end
-
-    Brave <-->|stdio| BraveProc
-    Hyper <-->|stdio| HyperProc
-
-    BraveProc -->|BRAVE_API_KEY| BraveAPI[Brave Search API]
-    HyperProc -->|HYPERBROWSER_API_KEY| HyperAPI[Hyperbrowser Cloud]
-```
+![Architecture](assets/architecture.png)
 
 ### Key design decisions
 
