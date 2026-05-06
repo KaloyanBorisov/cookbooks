@@ -11,7 +11,7 @@ async def test_react_agent_simple_passthrough() -> None:
         {
             "configurable": {
                 "system_prompt": "You are a helpful AI assistant.",
-                "mcp_tools": "mcp_config_sample.json",
+                "mcp_tools": "mcp_config.json",
             }
         },
     )
