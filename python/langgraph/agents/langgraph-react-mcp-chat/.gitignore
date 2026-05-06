@@ -27,7 +27,6 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-**/mcp_config.json
 tests/cassettes/
 
 # PyInstaller

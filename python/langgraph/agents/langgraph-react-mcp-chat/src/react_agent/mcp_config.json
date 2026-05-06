@@ -1,0 +1,20 @@
+{
+    "mcpServers": {
+        "brave-search": {
+            "transport": "stdio",
+            "command": "mcp-server-brave-search",
+            "args": [],
+            "env": {
+                "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+            }
+        },
+        "hyperbrowser": {
+            "transport": "stdio",
+            "command": "hyperbrowser-mcp",
+            "args": [],
+            "env": {
+                "HYPERBROWSER_API_KEY": "${HYPERBROWSER_API_KEY}"
+            }
+        }
+    }
+}
