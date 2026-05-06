@@ -1,0 +1,28 @@
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    env_file:
+      - .env
+    volumes:
+      - ./src/react_agent/mcp_config.json:/app/src/react_agent/mcp_config.json:ro
+    command: ["python", "-m", "pytest", "tests/", "-v", "--tb=short"]
+
+  unit-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    env_file:
+      - .env
+    command: ["python", "-m", "pytest", "tests/unit_tests/", "-v", "--tb=short"]
+
+  integration-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    env_file:
+      - .env
+    volumes:
+      - ./src/react_agent/mcp_config.json:/app/src/react_agent/mcp_config.json:ro
+    command: ["python", "-m", "pytest", "tests/integration_tests/", "-v", "--tb=short"]

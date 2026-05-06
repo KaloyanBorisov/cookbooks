@@ -1,4 +1,4 @@
-.PHONY: all format lint test tests test_watch integration_tests docker_tests help extended_tests
+.PHONY: all format lint test tests test_watch integration_tests docker_tests docker_unit_tests docker_integration_tests docker_build help extended_tests
 
 # Default target executed when no arguments are given to make.
 all: help
@@ -9,6 +9,11 @@ TEST_FILE ?= tests/unit_tests/
 test:
 	python -m pytest $(TEST_FILE)
 
+tests: test
+
+integration_tests:
+	python -m pytest tests/integration_tests/
+
 test_watch:
 	python -m ptw --snapshot-update --now . -- -vv tests/unit_tests
 
@@ -18,6 +23,21 @@ test_profile:
 extended_tests:
 	python -m pytest --only-extended $(TEST_FILE)
 
+######################
+# DOCKER TESTS
+######################
+
+docker_build:
+	docker compose -f docker-compose.test.yml build
+
+docker_tests: docker_build
+	docker compose -f docker-compose.test.yml run --rm test
+
+docker_unit_tests: docker_build
+	docker compose -f docker-compose.test.yml run --rm unit-test
+
+docker_integration_tests: docker_build
+	docker compose -f docker-compose.test.yml run --rm integration-test
 
 ######################
 # LINTING AND FORMATTING
@@ -58,7 +78,14 @@ help:
 	@echo 'format                       - run code formatters'
 	@echo 'lint                         - run linters'
 	@echo 'test                         - run unit tests'
-	@echo 'tests                        - run unit tests'
+	@echo 'tests                        - alias for test'
+	@echo 'integration_tests            - run integration tests'
 	@echo 'test TEST_FILE=<test_file>   - run all tests in file'
 	@echo 'test_watch                   - run unit tests in watch mode'
+	@echo 'spell_check                  - check spelling'
+	@echo 'spell_fix                    - fix spelling issues'
+	@echo 'docker_build                 - build the test Docker image'
+	@echo 'docker_tests                 - run all tests in Docker'
+	@echo 'docker_unit_tests            - run unit tests in Docker'
+	@echo 'docker_integration_tests     - run integration tests in Docker'
 

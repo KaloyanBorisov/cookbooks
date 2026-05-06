@@ -1,6 +1,8 @@
 """Utility & helper functions."""
 
 import json
+import os
+import re
 from pathlib import Path
 from typing import Dict, Any
 import aiofiles
@@ -52,15 +54,20 @@ async def load_mcp_config_json(filepath: str = "mcp_config.json") -> Dict[str, A
         if "mcpServers" in config:
             for server_name, server_config in config["mcpServers"].items():
                 # Skip if transport is already defined
-                if "transport" in server_config:
-                    continue
+                if "transport" not in server_config:
+                    # command 파라미터가 없는 경우 무시하고 기본값으로 "sse" 사용
+                    if "command" in server_config and server_config["command"] == "npx":
+                        server_config["transport"] = "stdio"
+                    else:
+                        server_config["transport"] = "sse"
 
-                # Add the appropriate transport based on the command
-                # command 파라미터가 없는 경우 무시하고 기본값으로 "sse" 사용
-                if "command" in server_config and server_config["command"] == "npx":
-                    server_config["transport"] = "stdio"
-                else:
-                    server_config["transport"] = "sse"
+                # Resolve ${VAR} references in env values
+                if "env" in server_config:
+                    resolved = {}
+                    for k, v in server_config["env"].items():
+                        match = re.fullmatch(r"\$\{(\w+)\}", v)
+                        resolved[k] = os.environ.get(match.group(1), v) if match else v
+                    server_config["env"] = resolved
 
         return config
     except FileNotFoundError:
