@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
-from typing import Dict, List, cast
+from typing import Dict, List
 
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import AIMessage, SystemMessage
+from langchain_core.messages import SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.checkpoint.memory import MemorySaver
@@ -19,7 +19,7 @@ memory = MemorySaver()
 
 async def call_model(
     state: State, config: RunnableConfig
-) -> Dict[str, List[AIMessage]]:
+) -> Dict[str, List]:
     configuration = Configuration.from_runnable_config(config)
 
     system_message = configuration.system_prompt.format(
@@ -47,12 +47,10 @@ async def call_model(
     agent = create_react_agent(model, all_tools, checkpointer=memory)
 
     messages = [SystemMessage(content=system_message), *state.messages]
-    response = cast(
-        AIMessage,
-        await agent.ainvoke({"messages": messages}, config),
-    )
+    response = await agent.ainvoke({"messages": messages}, config)
 
-    return {"messages": [response["messages"][-1]]}
+    new_messages = response["messages"][len(messages):]
+    return {"messages": new_messages}
 
 
 builder = StateGraph(State, input_schema=InputState, context_schema=Configuration)

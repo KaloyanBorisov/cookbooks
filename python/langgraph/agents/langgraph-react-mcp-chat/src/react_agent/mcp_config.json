@@ -8,6 +8,22 @@
                 "BRAVE_API_KEY": "${BRAVE_API_KEY}"
             }
         },
+        "todoist": {
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "todoist-mcp"],
+            "env": {
+                "API_KEY": "${TODOIST_API_KEY}"
+            }
+        },
+        "firecrawl": {
+            "transport": "stdio",
+            "command": "npx",
+            "args": ["-y", "firecrawl-mcp"],
+            "env": {
+                "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
+            }
+        },
         "hyperbrowser": {
             "transport": "stdio",
             "command": "hyperbrowser-mcp",
