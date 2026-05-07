@@ -6,15 +6,21 @@ This document details how LangGraph is configured and integrated into the projec
 
 ```json
 {
-    "name": "LangGraph Solution Template for MCP",
-    "version": "1.0.0",
-    "python_version": "3.12",
-    "dependencies": ["."],
-    "graphs": {
-      "assist_with_planner": "./src/langgraph_mcp/with_planner/graph.py:graph",
-      "planner_style_agent": "./src/langgraph_mcp/planner_style/graph.py:graph"
+  "name": "LangGraph Solution Template for MCP",
+  "version": "1.0.0",
+  "python_version": "3.12",
+  "dependencies": ["."],
+  "graphs": {
+    "agent": {
+      "path": "./src/deepagent_mcp/agent.py:create_mcp_orchestrator",
+      "description": "Advanced MCP orchestrator agent using deepagents architecture with MCP tool integration."
     },
-    "env": ".env"
+    "simple_agent": {
+      "path": "./src/simple_agent/graph.py:graph",
+      "description": "Workflow Enhancement Agent that transforms task descriptions and integrations into structured workflows."
+    }
+  },
+  "env": ".env"
 }
 ```
 
@@ -24,7 +30,7 @@ This document details how LangGraph is configured and integrated into the projec
 *   **Python Version:** Specifies the target Python version (`3.12`).
 *   **Dependencies:** Indicates project dependencies relevant to LangGraph CLI deployment (`.` means the current project).
 *   **Graphs:** This is the core mapping that defines the available LangGraph graphs and their entry points.
-    *   Each key (e.g., `assist_with_planner`) is an identifier for a graph.
-    *   The value specifies the Python file and the graph object within that file (e.g., `./src/langgraph_mcp/with_planner/graph.py:graph` points to the `graph` object in `graph.py`).
-    *   This allows the LangGraph CLI and API server to discover and serve these specific graphs.
+    *   `agent` — the main MCP orchestrator, entry point at `src/deepagent_mcp/agent.py:create_mcp_orchestrator`.
+    *   `simple_agent` — the workflow enhancement agent, entry point at `src/simple_agent/graph.py:graph`.
+    *   This allows the LangGraph CLI and API server to discover and serve these graphs.
 *   **Environment:** Specifies the environment file (`.env`) to load for configuration variables. 

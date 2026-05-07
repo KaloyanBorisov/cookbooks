@@ -1,7 +1,7 @@
-# Implemented Assistant Strategies
+# Implemented Agents
 
-This project may add multiple strategies for implementing the LangGraph-based universal assistant. Each strategy may represent a different approach to orchestrating the interaction between the user, the assistant, and the MCP servers.
+This project provides two LangGraph agents, each serving a different purpose.
 
-Below are links to the detailed documentation for each strategy:
+*   **agent (`deepagent_mcp`):** Advanced MCP orchestrator that implements tool discovery, planning, and execution using the `deepagents` architecture. Entry point: `src/deepagent_mcp/agent.py:create_mcp_orchestrator`.
 
-*   **[With Planner](./with_planner.md):** This strategy utilizes a planning agent to decide which MCP server and tool to use based on the user query and available MCP capabilities.
+*   **simple_agent:** Workflow enhancement agent that transforms task descriptions and a list of integrations into detailed, step-by-step workflows. Entry point: `src/simple_agent/graph.py:graph`. See [simple_agent README](../../src/simple_agent/README.md) for usage details.

@@ -1,26 +1,21 @@
-FROM langchain/langgraph-api:3.12
+FROM python:3.12-slim
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /app
 
-# -- Adding local package . --
-ADD . /deps/workers
-# -- End of local package . --
+COPY pyproject.toml langgraph.json ./
+COPY src/ src/
 
-# -- Installing all local dependencies --
-RUN PYTHONDONTWRITEBYTECODE=1 uv pip install --system --prerelease=allow --no-cache-dir -c /api/constraints.txt -e /deps/*
-# -- End of local dependencies install --
-ENV LANGSERVE_GRAPHS='{"agent": {"path": "/deps/workers/src/deepagent_mcp/agent.py:create_mcp_orchestrator", "description": "Advanced MCP orchestrator agent that implements core orchestration logic using deepagents architecture with MCP tool integration. Provides intelligent tool discovery, planning, and execution capabilities."}}'
+RUN pip install --no-cache-dir -e ".[dev]"
 
+RUN npm install -g @playwright/mcp@latest
 
+EXPOSE 2024
+EXPOSE 2025
 
-# -- Ensure user deps didn't inadvertently overwrite langgraph-api
-RUN mkdir -p /api/langgraph_api /api/langgraph_runtime /api/langgraph_license && touch /api/langgraph_api/__init__.py /api/langgraph_runtime/__init__.py /api/langgraph_license/__init__.py
-RUN PYTHONDONTWRITEBYTECODE=1 uv pip install --system --prerelease=allow --no-cache-dir --no-deps -e /api
-# -- End of ensuring user deps didn't inadvertently overwrite langgraph-api --
-# -- Removing build deps from the final image ~<:===~~~ --
-RUN pip uninstall -y pip setuptools wheel
-RUN rm -rf /usr/local/lib/python*/site-packages/pip* /usr/local/lib/python*/site-packages/setuptools* /usr/local/lib/python*/site-packages/wheel* && find /usr/local/bin -name "pip*" -delete || true
-RUN rm -rf /usr/lib/python*/site-packages/pip* /usr/lib/python*/site-packages/setuptools* /usr/lib/python*/site-packages/wheel* && find /usr/bin -name "pip*" -delete || true
-RUN uv pip uninstall --system pip setuptools wheel && rm /usr/bin/uv /usr/bin/uvx
-
-WORKDIR /deps/workers
+CMD ["sh", "-c", "if [ \"$DEBUG\" = \"1\" ]; then python -m debugpy --listen 0.0.0.0:2025 --wait-for-client -m langgraph dev --host 0.0.0.0 --port 2024; else langgraph dev --host 0.0.0.0 --port 2024; fi"]

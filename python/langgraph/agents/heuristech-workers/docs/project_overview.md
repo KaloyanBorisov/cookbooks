@@ -10,19 +10,26 @@ The core idea is to implement a multi-agent pattern where an assistant routes us
 
 *   **LangGraph:** Used to define and execute the assistant's workflow as a graph. Nodes represent actions (like routing, calling agents, or interacting with MCP), and edges define the control flow.
 *   **MCP:** Provides a standardized way for LangGraph agents to communicate with external services (MCP Servers) offering tools and data.
-*   **Strategies:** Different implementations of the LangGraph assistant workflow are provided as distinct "strategies" (e.g., using a planner, a retriever, etc.).
-*   **MCP Wrapper (`src/langgraph_mcp/mcp_wrapper.py`):** A generic module to handle communication with MCP servers (both standard and Smithery-based) using a strategy pattern.
+*   **deepagent_mcp:** The primary MCP orchestrator agent built on the `deepagents` library, with intelligent tool discovery and planning.
+*   **simple_agent:** A lightweight workflow enhancement agent that transforms task descriptions into structured workflows.
 
 ## Directory Structure
 
--   `src/langgraph_mcp/`: Contains the core source code.
-    -   `with_planner/`: Old planner agent implementation strategy.
-    -   `planner_style/`: New planner style agent implementation strategy. Accomodates MCP servers that require their session to last multiple executions of the agent graph
-    -   `state.py`: Defines the common state shared across graphs.
+-   `src/deepagent_mcp/`: Primary MCP orchestrator agent.
+    -   `agent.py`: Graph entry point (`create_mcp_orchestrator`).
+    -   `config.py`: Configuration management.
+    -   `state.py`: State definitions.
+    -   `prompts.py`: System prompts.
+    -   `tools.py`: Tool definitions.
+    -   `utils.py`: Utility functions.
+-   `src/simple_agent/`: Workflow enhancement agent.
+    -   `graph.py`: Graph entry point (`graph`).
+    -   `agent.py`: Agent implementation.
+    -   `config.py`: Configuration management.
+    -   `state.py`: State definitions.
+-   `src/langgraph_mcp/`: Shared utilities.
     -   `utils.py`: Common utility functions (e.g., loading models).
-    -   `mcp_wrapper.py`: Handles interaction with MCP servers.
 -   `pyproject.toml`: Project metadata and dependencies.
 -   `langgraph.json`: LangGraph-specific configuration, including graph entry points.
 -   `README.md`: General project description for human readers.
--   `llms.txt`: Entry point for AI/LLM-readable documentation.
--   `docs/`: Directory containing detailed markdown documentation linked from `llms.txt`. 
+-   `docs/`: Directory containing detailed markdown documentation. 

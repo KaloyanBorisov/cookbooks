@@ -5,7 +5,7 @@ This document outlines the key dependencies and metadata for the `langgraph-mcp`
 ## Project Information
 
 - **Name:** `langgraph-mcp`
-- **Version:** `0.0.1`
+- **Version:** `1.0.0`
 - **Description:** LangGraph Solution Template for MCP
 - **Authors:** Heuris Labs <hello@heuris.co>
 - **License:** MIT
@@ -17,24 +17,43 @@ This document outlines the key dependencies and metadata for the `langgraph-mcp`
 
 ## Core Dependencies
 
-- `asyncio>=3.4.3`
-- `langchain>=0.2.17`
-- `langchain-core>=0.3.21`
-- `langchain-openai>=0.2.11`
-- `langgraph>=0.2.56`
-- `mcp>=1.0.0` (Model Context Protocol library)
-- `openai>=1.57.0`
-- `python-dotenv>=1.0.1`
-- `smithery` (For interacting with Smithery-based MCP servers)
+- `asyncio`
+- `langchain`
+- `langchain-core`
+- `langchain-openai`
+- `langchain-anthropic>=0.3.15`
+- `langchain-mcp-adapters`
+- `langgraph`
+- `langgraph-cli[inmem]>=0.3.1`
+- `langgraph-checkpoint-postgres>=2.0.23`
+- `mcp[cli]` (Model Context Protocol library)
+- `openai`
+- `python-dotenv`
+- `pydantic>=2.6`
+- `psycopg[binary,pool]>=3.2.9`
+- `sse-starlette>=2.1.0,<2.2.0`
+- `requests>=2.32.3`
+- `httpx>=0.24.0`
+- `rich>=13.0.0`
+- `langsmith>=0.3.37`
+- `msgpack>=1.1.1`
+- `deepagents`
 
 ## Development Dependencies (`dev`)
 
 - `debugpy`
-- `mypy>=1.11.1`
-- `ruff>=0.6.1`
+- `mypy`
+- `ruff`
+- `langgraph-cli[inmem]`
+
+## Test Dependencies (`test`)
+
+- `pytest`
+- `langgraph-sdk`
+- `requests`
 
 ## Build System
 
-- **Requires:** `setuptools>=73.0.0`, `wheel`
+- **Requires:** `setuptools`, `wheel`
 - **Build Backend:** `setuptools.build_meta`
-- **Packages:** `langgraph_mcp` (sourced from `src/langgraph_mcp`)
+- **Packages:** `langgraph_mcp` (from `src/langgraph_mcp`), `deepagent_mcp` (from `src/deepagent_mcp`), `simple_agent` (from `src/simple_agent`)

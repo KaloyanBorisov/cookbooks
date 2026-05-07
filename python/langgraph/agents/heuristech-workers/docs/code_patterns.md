@@ -4,7 +4,7 @@ This document outlines recurring code patterns and conventions used throughout t
 
 ## 1. LangGraph Node Implementation (LLM Interaction)
 
-Nodes within the LangGraph graphs that involve Large Language Model (LLM) calls generally follow this pattern (example from `with_planner/graph.py`'s `planner` node):
+Nodes within the LangGraph graphs that involve Large Language Model (LLM) calls generally follow this pattern:
 
 ```python
 async def planner(state: State, *, config: RunnableConfig) -> dict[str, list[BaseMessage]]:
@@ -60,61 +60,13 @@ async def planner(state: State, *, config: RunnableConfig) -> dict[str, list[Bas
 
 ### Chat Models
 
-The `src.langgraph_mcp.utils.load_chat_model(fully_specified_name: str)` function provides a standardized way to load chat models:
+The `src/langgraph_mcp/utils.py:load_chat_model(fully_specified_name: str)` function provides a standardized way to load chat models:
 
 *   It expects a `fully_specified_name` string in the format `"provider/model-name"` (e.g., `"openai/gpt-4o"`).
 *   It parses the provider and model name.
 *   It uses `langchain.chat_models.init_chat_model(model, model_provider=provider)` to instantiate the appropriate LangChain chat model client.
 
-## 3. Interfacing with MCP Servers (`mcp_wrapper.py`)
-
-Interaction with MCP servers is standardized through the `src.langgraph_mcp.mcp_wrapper` module, employing a Strategy Pattern:
-
-*   **Abstract Base Class (`MCPSessionFunction`):** Defines the interface with an `async def __call__(self, server_name: str, env: dict, session: ClientSession) -> Any:` method.
-*   **Concrete Strategy Classes:** Implement `MCPSessionFunction` for specific MCP operations:
-    *   `RoutingDescription`: Fetches tools, prompts, and resources to generate a server description.
-    *   `GetTools`: Fetches tools and formats them for LangChain/LangGraph use.
-    *   `GetPrompts`: Fetches available prompts from the server.
-    *   `RunTool`: Executes a specific tool on the server with given arguments.
-*   **Unified Executor (`apply` function):**
-    *   `async def apply(server_name: str, server_config: dict, fn: MCPSessionFunction) -> Any:`
-    *   Takes the server name, its configuration (`server_config`), and an instance of an `MCPSessionFunction` (`fn`).
-    *   Determines whether to connect using `mcp.stdio_client` (for standard MCP servers defined in `mcpServers`) or `mcp.client.streamable_http.streamablehttp_client` (depending on the `transport`).
-    *   Establishes the `ClientSession`.
-    *   Calls the strategy instance: `await fn(server_name, env, session)`.
-
-**Usage within Graph Nodes:**
-
-Nodes needing to interact with an MCP server use this pattern:
-
-```python
-# Example from with_planner_n_prompts/graph.py -> discover_expert_prompts
-
-# Get server name (e.g., from current_task.expert)
-server_name = current_task.expert
-
-# Get server config (e.g., using utils.get_server_config)
-server_config = configuration.get_server_config(server_name)
-
-# Call the wrapper with the specific action 
-prompts_response = await mcp.apply(
-    server_name, 
-    server_config, 
-    mcp.GetPrompts() # Instance of the desired MCPSessionFunction
-)
-
-# Example from with_planner/graph.py -> call_tool
-tool_call = state.messages[-1].tool_calls[0]
-tool_output = await mcp.apply(
-    server_name, 
-    server_config, 
-    mcp.RunTool(tool_call['name'],**tool_call['args']) # Pass tool name/args
-)
-```
-
-This pattern abstracts the details of session management and specific MCP commands, making the graph nodes cleaner and focused on their orchestration logic. 
-
-## 4. Human In The Loop (HITL)
+## 3. Human In The Loop (HITL)
 
 ### Motivation
 

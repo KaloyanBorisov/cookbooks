@@ -65,3 +65,33 @@ This documentation provides details necessary for Large Language Models (LLMs) a
     pytest tests/test_assistant_with_planner.py
     pytest tests/test_planner_style_agent.py
     ```
+
+## Debugging with VS Code
+
+The project includes a `.vscode/launch.json` with a **Remote Attach** configuration that connects to a `debugpy` session running inside the Docker container.
+
+**1. Start the container in debug mode**
+
+```bash
+DEBUG=1 docker compose up --build
+```
+
+The container will freeze on startup — `debugpy` is waiting for VS Code to attach before allowing the server to proceed.
+
+**2. Attach VS Code**
+
+- Open the **Run & Debug** panel (`Ctrl+Shift+D`)
+- Select **"Python Debugger: Remote Attach"** from the dropdown
+- Press `F5`
+
+VS Code connects to `localhost:2025` and the container unfreezes — the LangGraph server starts normally on port `2024`.
+
+**3. Set breakpoints**
+
+Open any file under `src/` and click in the gutter to place a breakpoint. The `src/` directory is mounted into the container, so local files map directly to the running code.
+
+**4. Trigger the code**
+
+Make a request to the API (e.g. via LangGraph Studio at `http://localhost:2024` or an HTTP client). Execution will pause at your breakpoints in VS Code.
+
+> **Note:** When `DEBUG=1` the container will hang indefinitely until VS Code attaches. To run without debugging, omit the flag: `docker compose up`.
