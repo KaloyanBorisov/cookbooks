@@ -6,7 +6,7 @@
   </a>
 </p>
 
-# Cookbooks
+# Agent patterns
 
 _A curated collection of code snippets, notebooks, and best practices for building powerful, context-rich applications with LangGraph and LangSmith._
 
