@@ -1,42 +1,16 @@
 services:
-  postgres:
-    image: postgres:16
-    container_name: workers-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    ports:
-      - "5442:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: workers-api
+    container_name: mcp-agent-template
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
     env_file:
       - .env
     environment:
-      DATABASE_URI: postgresql://postgres:postgres@postgres:5432/postgres?sslmode=disable
       DEBUG: ${DEBUG:-0}
     volumes:
       - ./src:/app/src
     ports:
       - "2024:2024"
       - "2025:2025"
-
-volumes:
-  pgdata:
-    driver: local

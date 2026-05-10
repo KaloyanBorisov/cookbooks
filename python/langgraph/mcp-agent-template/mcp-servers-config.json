@@ -5,8 +5,18 @@
         "@playwright/mcp@latest",
         "--no-sandbox"
       ],
+      "transport": "stdio"
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
       "transport": "stdio",
-      "description": "Use for browser based interaction or automation tasks"
+      "env": {
+        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
+      }
     }
   }
 

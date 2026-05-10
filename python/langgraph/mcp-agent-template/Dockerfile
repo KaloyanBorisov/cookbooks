@@ -8,12 +8,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-COPY pyproject.toml langgraph.json ./
+COPY pyproject.toml langgraph.json mcp-servers-config.json ./
 COPY src/ src/
 
 RUN pip install --no-cache-dir -e ".[dev]"
 
-RUN npm install -g @playwright/mcp@latest
+RUN npm install -g @playwright/mcp@latest firecrawl-mcp && \
+    npx playwright install chrome --with-deps
 
 EXPOSE 2024
 EXPOSE 2025

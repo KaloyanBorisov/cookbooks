@@ -1,9 +1,34 @@
 """Configuration management for the MCP Orchestrator."""
 
+import json
 import os
 from dataclasses import dataclass, field, fields
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Type, TypeVar
 from langchain_core.runnables import RunnableConfig, ensure_config
+
+
+def _expand_env_vars(obj: Any) -> Any:
+    """Recursively expand ${VAR} patterns in string values using os.environ."""
+    if isinstance(obj, str):
+        return os.path.expandvars(obj)
+    if isinstance(obj, dict):
+        return {k: _expand_env_vars(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_expand_env_vars(item) for item in obj]
+    return obj
+
+
+def _load_default_mcp_config() -> Dict[str, Any]:
+    """Load MCP server config from mcp-servers-config.json if present."""
+    for candidate in [
+        Path("mcp-servers-config.json"),
+        Path(__file__).parent.parent.parent / "mcp-servers-config.json",
+    ]:
+        if candidate.exists():
+            with open(candidate) as f:
+                return _expand_env_vars(json.load(f))
+    return {}
 
 T = TypeVar("T", bound="Configuration")
 
@@ -29,7 +54,7 @@ class Configuration:
 
     # MCP server configurations
     mcp_server_config: Dict[str, Any] = field(
-        default_factory=dict,
+        default_factory=_load_default_mcp_config,
         metadata={"description": "Dictionary mapping MCP server name to its configuration"}
     )
 

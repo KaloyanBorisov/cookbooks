@@ -4,7 +4,6 @@ Implements the core orchestration logic using deepagents architecture
 with MCP tool integration via langchain-mcp-adapters.
 """
 
-import os
 from dotenv import load_dotenv
 from typing import Dict, Any, List, Optional, Union
 
@@ -84,7 +83,7 @@ async def discover_mcp_tools(state: MCPOrchestratorState, *, config: RunnableCon
     cfg = Configuration.from_runnable_config(config)
     logger = setup_logging(cfg.debug_mode)
 
-    logger.info("Starting MCP tool discovery...")
+    logger.info(f"Starting MCP tool discovery... mcp_server_config={list(cfg.mcp_server_config.keys())}")
 
     # Initialize MCP tool manager
     tool_manager = MCPToolManager(cfg.mcp_server_config)
@@ -318,7 +317,6 @@ async def create_mcp_orchestrator(config: Union[Configuration, Dict[str, Any]]) 
 
     # Handle both Configuration objects and dictionaries from LangGraph
     if isinstance(config, dict):
-        # Convert dict to Configuration object
         config = Configuration.from_runnable_config({"configurable": config})
 
     # Create state graph
@@ -358,30 +356,19 @@ async def create_mcp_orchestrator(config: Union[Configuration, Dict[str, Any]]) 
         builder.add_edge("plan_and_filter", "execute")
         builder.add_edge("execute", "__end__")
 
-        # Compile with interrupt support - interrupt before execute if needed
         interrupt_before = ["execute"] if config.interrupt_before_execution else []
-        from langgraph.checkpoint.postgres import PostgresSaver
-        DB_URI = os.getenv("DATABASE_URI")
-        checkpointer = PostgresSaver.from_conn_string(DB_URI)
-        return builder.compile(interrupt_before=interrupt_before, checkpointer=checkpointer)
+        return builder.compile(interrupt_before=interrupt_before)
 
     else:
-        # Phase 1 & 2: Simple workflow (existing implementation)
+        # Phase 1 & 2: Simple workflow
         builder.add_node("discover_tools", discover_mcp_tools)
         builder.add_node("execute", execute_with_mcp_tools)
 
-        # Set entry point
         builder.set_entry_point("discover_tools")
-
-        # Add edges
         builder.add_edge("discover_tools", "execute")
         builder.add_edge("execute", "__end__")
 
-        # Compile and return
-        from langgraph.checkpoint.postgres import PostgresSaver
-        DB_URI = os.getenv("DATABASE_URI")
-        checkpointer = PostgresSaver.from_conn_string(DB_URI)
-        return builder.compile(checkpointer=checkpointer)
+        return builder.compile()
 
 
 # Export the main creation function

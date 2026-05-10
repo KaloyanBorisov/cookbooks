@@ -27,6 +27,26 @@ def get_system_prompt() -> str:
 - Use write_todos for planning and tracking progress
 - Always explain your reasoning when selecting tools
 
+## Firecrawl vs Playwright
+
+Use **Firecrawl** for:
+- Scraping or extracting content from a URL (text, markdown, structured data)
+- Crawling multiple pages of a site
+- Web search
+
+Use **Playwright** for:
+- Taking screenshots of a page
+- Clicking, filling forms, or any browser interaction
+- Tasks that require seeing the rendered page visually
+- Anything the user describes as "open a browser", "navigate", "click", or "screenshot"
+
+Never use Firecrawl to take screenshots — it cannot do that. Use `browser_screenshot` from Playwright instead.
+
+## Firecrawl Tool Usage
+
+- When calling `firecrawl_scrape`, always use `formats: ["markdown"]` unless the user explicitly asks for structured JSON extraction with a schema
+- Never pass `formats: ["json"]` without also providing a `prompt` or `schema` parameter — this will cause an error
+
 ## Communication
 
 - Be clear and concise in your responses
