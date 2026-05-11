@@ -152,7 +152,7 @@ def main():
     load_dotenv()
     
     # Check for required environment variables
-    required_vars = ["SUPABASE_URL", "SUPABASE_SERVICE_KEY", "GITHUB_PAT"]
+    required_vars = ["SUPABASE_URL", "SUPABASE_SECRET_KEY", "GITHUB_PAT"]
     missing_vars = [var for var in required_vars if not os.getenv(var)]
     
     if missing_vars:
@@ -164,7 +164,7 @@ def main():
     try:
         supabase = create_client(
             os.environ["SUPABASE_URL"],
-            os.environ["SUPABASE_SERVICE_KEY"]
+            os.environ["SUPABASE_SECRET_KEY"]
         )
         print("✅ Connected to Supabase")
     except Exception as e:

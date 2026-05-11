@@ -1,0 +1,37 @@
+services:
+  setup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    profiles:
+      - setup
+    command: sh -c "python setup_database.py && python setup_secrets.py"
+
+  token:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    profiles:
+      - token
+    command: python generate_supabase_token.py
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-auth-demo
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DEBUG: ${DEBUG:-0}
+    volumes:
+      - ./agent.py:/app/agent.py
+      - ./auth.py:/app/auth.py
+    ports:
+      - "2024:2024"
+      - "2025:2025"

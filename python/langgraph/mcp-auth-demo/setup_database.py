@@ -18,7 +18,7 @@ def main():
     load_dotenv()
     
     # Check for required environment variables
-    required_vars = ["SUPABASE_URL", "SUPABASE_SERVICE_KEY"]
+    required_vars = ["SUPABASE_URL", "SUPABASE_SECRET_KEY"]
     missing_vars = [var for var in required_vars if not os.getenv(var)]
     
     if missing_vars:
@@ -29,7 +29,7 @@ def main():
     # Initialize Supabase client with service key (for admin operations)
     supabase: Client = create_client(
         os.environ["SUPABASE_URL"],
-        os.environ["SUPABASE_SERVICE_KEY"]
+        os.environ["SUPABASE_SECRET_KEY"]
     )
     
     print("🔐 Setting up Supabase database for MCP Auth Demo...")

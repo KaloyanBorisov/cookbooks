@@ -1,35 +1,47 @@
-<!-- Logo -->
-<p align="center"><img src="assets/langchain-logo.png" alt="LangChain Logo" width="500"/></p>
-<p align="center">
-  <a href="LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License"/>
-  </a>
-</p>
+# agent-patterns
 
-# Agent patterns
+_A curated collection of agent patterns, examples, and templates built with LangGraph, LangSmith, and the broader LLM ecosystem._
 
-_A curated collection of code snippets, notebooks, and best practices for building powerful, context-rich applications with LangGraph and LangSmith._
+## Structure
 
-## Table of Contents
-- [Cookbooks](#cookbooks)
-  - [Table of Contents](#table-of-contents)
-  - [Repository Structure](#repository-structure)
-  - [Purpose](#purpose)
+```
+python/
+├── langgraph/
+│   ├── agent-quickstart/       # Quickstart examples across frameworks
+│   │   ├── A2A/                # Agent-to-agent communication
+│   │   ├── agno/
+│   │   ├── autogen/
+│   │   ├── browser-use/
+│   │   ├── crewai/
+│   │   ├── google-adk/
+│   │   ├── langchain/
+│   │   ├── langchain-mcp-adapters/
+│   │   ├── langgraph/
+│   │   ├── langgraph-codeact/
+│   │   ├── langgraph-platform/
+│   │   ├── langgraph_swarm/
+│   │   ├── langmem/
+│   │   ├── model_context_protocol/
+│   │   ├── openai-agents/
+│   │   └── smolagents/
+│   ├── agents/                 # Full agent implementations
+│   │   ├── agentic-RAG/
+│   │   ├── arxiv-researcher/
+│   │   ├── assistants-demo/
+│   │   ├── basic-RAG/
+│   │   ├── corrective-rag/
+│   │   └── ecommerce-hierarchical-system/
+│   ├── mcp-agent-template/     # Containerized MCP agent (Playwright + Firecrawl)
+│   ├── mcp-auth-demo/          # Per-user MCP auth with Supabase + LangGraph
+│   ├── persistence/            # Fault-tolerant graph patterns
+│   ├── react-mcp-chat/         # ReAct agent with MCP chat UI
+│   └── streaming/              # Custom streaming examples
+└── langsmith/
+    ├── evaluation/
+    ├── observability/
+    └── prompt-engineering/
+```
 
-## Repository Structure
+## License
 
-- **langgraph/**: Contains modules and examples related to LangGraph, including:
-  - **architectures/**: Architectural patterns and examples.
-  - **human-in-the-loop/**: Examples involving human interaction.
-  - **persistence/**: Persistence and data storage patterns.
-  - **streaming/**: Streaming data and real-time processing examples.
-
-- **langsmith/**: Contains modules and examples related to LangSmith, including:
-  - **evaluation/**: Evaluation techniques and examples.
-  - **observability/**: Observability and tracing examples, including:
-    - **tracing/otel/**: OpenTelemetry tracing examples.
-  - **prompt-engineering/**: Prompt engineering patterns and examples.
-
-## Purpose
-
-This repository serves as a comprehensive guide for developers looking to implement advanced features and design patterns using LangGraph and LangSmith. It aims to provide practical examples and best practices to facilitate the development of robust applications.
+[MIT](LICENSE)
