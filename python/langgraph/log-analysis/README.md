@@ -13,20 +13,37 @@ A streaming log analyzer that leverages the custom streaming mode in LangGraph a
 
 ## Usage
 
-1. Install the required dependencies:
+### LangGraph Studio (recommended)
+
+1. Copy `.env.example` to `.env` and add your `OPENAI_API_KEY` and `LANGSMITH_API_KEY`.
+
+2. Start the dev server:
    ```bash
-   pip install -r requirements.txt
+   docker compose up --build
    ```
 
-2. Run the analyzer on a log file:
-   ```bash
-   python custom_streaming_log_analysis.py <log_file_path>
+3. Open [LangGraph Studio](https://smith.langchain.com/studio) and connect to `http://localhost:2024`.
+
+4. In the chat panel, type the path to your log file:
    ```
-   Replace `<log_file_path>` with the path to your log file (e.g., `sample_log.log`).
+   /app/sample_log.log
+   ```
+   Or include it anywhere in your message, e.g. `analyze /app/sample_log.log`.
+
+   Place any custom log files in the project directory — they are volume-mounted into the container at `/app/`.
+
+### CLI
+
+```bash
+pip install -r requirements.txt
+python custom_streaming_log_analysis.py /path/to/your.log
+```
 
 ## Files
-- `custom_streaming_log_analysis.py`: Main script for streaming log analysis
-- `sample_log.log`: Example log file for testing
+- `custom_streaming_log_analysis.py` — streaming log analyzer (outer graph for Studio + inner analysis graph)
+- `sample_log.log` — example log file for testing
+- `docker-compose.yml` — runs the LangGraph dev server on port 2024
+- `langgraph.json` — graph registration for LangGraph Studio
 
 ## Requirements
 See `requirements.txt` for the list of required Python packages.
@@ -202,6 +219,6 @@ Think of it like a web framework: you define route handlers, but Flask/FastAPI d
 
 This architecture maps directly to live log streaming. The only change needed is the input source:
 
-- Replace `TextLoader` with a live reader (Kafka consumer, socket, `tail -f` via `asyncio`)
+- Replace the file reader with a live source (Kafka consumer, socket, `tail -f` via `asyncio`)
 - Each incoming batch of log lines becomes a chunk fed into the same graph
 - The sliding buffer, triage pattern, and custom streaming all work identically on a live stream

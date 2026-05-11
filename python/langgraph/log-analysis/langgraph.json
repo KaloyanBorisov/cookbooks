@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "log_analysis": "./custom_streaming_log_analysis.py:graph"
+  },
+  "env": ".env"
+}

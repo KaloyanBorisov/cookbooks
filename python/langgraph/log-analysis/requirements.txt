@@ -1,5 +1,7 @@
 langchain_community
 langchain_text_splitters
 langchain
+langchain_openai
 langgraph
-python-dotenv 
+langgraph-cli[inmem]
+python-dotenv

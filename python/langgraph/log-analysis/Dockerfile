@@ -11,4 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENTRYPOINT ["python", "custom_streaming_log_analysis.py"]
+EXPOSE 2024
+
+ENTRYPOINT []
+CMD ["langgraph", "dev", "--host", "0.0.0.0", "--port", "2024", "--no-browser"]
