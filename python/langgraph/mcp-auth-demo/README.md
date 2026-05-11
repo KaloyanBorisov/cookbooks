@@ -2,6 +2,41 @@
 
 Per-user MCP authentication with LangGraph — each user's GitHub tools run under their own credentials, stored securely in Supabase Vault.
 
+## Agent Pattern
+
+This is **not RAG**. There is no vector store, no document retrieval, no embeddings.
+
+This is a **ReAct agent** (Reason + Act) — the LLM reasons about what GitHub tool to call, calls it via MCP, gets live results back, reasons again, and repeats until it can answer. All data is real-time from the GitHub API, not pre-indexed documents.
+
+```
+RAG:    query → retrieve chunks from vector store → augment prompt → answer
+ReAct:  query → reason → call live API → reason over result → call again? → answer
+```
+
+## How Authentication Intercepts the Request
+
+Every incoming HTTP request passes through `auth.py` before any graph node runs. LangGraph calls `@auth.authenticate` automatically because `auth.py` is registered as the auth handler in `langgraph.json`.
+
+```
+HTTP request
+     │
+     ▼
+@auth.authenticate          ← intercepts here
+  validate Supabase JWT
+  fetch GitHub PAT from Vault
+  attach { github_token, email, ... } to request config
+     │
+     ▼
+get_mcp_tools_node          ← first graph node
+  read github_token from config
+  open MCP connection with that token  ← GitHub MCP authenticated here
+     │
+     ▼
+agent_node                  ← LLM has tools, never touches auth again
+```
+
+The middleware does not authenticate the MCP connection directly — it fetches the user's GitHub PAT and hands it off via the request config. The actual MCP authentication happens in `get_mcp_tools_node` when the `Authorization: Bearer <github_token>` header is sent to the GitHub MCP server.
+
 ## How It Works
 
 ```
@@ -16,24 +51,51 @@ Client → Supabase Auth → LangGraph middleware → Supabase Vault → GitHub 
 
 ## Architecture
 
-```mermaid
-sequenceDiagram
-  participant Client
-  participant Supabase as Supabase Auth
-  participant LangGraph
-  participant Vault as Supabase Vault
-  participant GitHub as GitHub MCP
-
-  Client->>Supabase: Login (email/password)
-  Supabase-->>Client: JWT token
-  Client->>LangGraph: Request with Bearer token
-  LangGraph->>Supabase: Validate token → get user ID
-  LangGraph->>Vault: Fetch github_pat_{user_id}
-  Vault-->>LangGraph: GitHub PAT
-  LangGraph->>GitHub: MCP tools with user's PAT
-  GitHub-->>LangGraph: Tool responses
-  LangGraph-->>Client: Agent response
 ```
+👤 User (Bearer JWT)
+       │
+       ▼
+┌─────────────────── auth.py ───────────────────┐
+│  validate JWT  ──►  Supabase Auth             │
+│  fetch PAT     ──►  Supabase Vault            │
+│  scope threads to owner                       │
+└───────────────────────┬───────────────────────┘
+                        │ github_token in config
+                        ▼
+┌─────────────────── agent.py ──────────────────┐
+│                                               │
+│  [1] get_mcp_tools  ──►  GitHub MCP Server   │
+│          │                                    │
+│  [2] agent (GPT-4o + tools)  ──►  OpenAI     │
+│          │                                    │
+│     tool calls?                               │
+│     ├── yes ──►  [3] tools  ──►  GitHub MCP  │
+│     │                │ loop back              │
+│     └── no                                    │
+└───────────────────────┬───────────────────────┘
+                        │
+                        ▼
+                  💬 Response
+```
+
+## Two Tokens, Two Jobs
+
+This project uses two separate tokens that serve completely different purposes:
+
+```
+Supabase JWT  →  proves who you are  →  unlocks your GitHub PAT from Vault
+GitHub PAT    →  authorizes MCP      →  agent acts as you on GitHub
+```
+
+**Supabase JWT** — issued when you log in to Supabase. Sent as `Authorization: Bearer` on every request to the LangGraph agent. The auth middleware validates it, extracts your `user_id`, and uses it to look up your GitHub PAT in the Vault. It never touches GitHub directly.
+
+**GitHub PAT** — your personal GitHub access token, stored once in Supabase Vault. Retrieved per-request by the auth layer and injected into the MCP connection header. This is what actually authorizes the agent to call GitHub on your behalf — accessing your private repos, issues, PRs, and anything else your PAT permits.
+
+The Supabase JWT identifies you. The GitHub PAT acts as you.
+
+### Generating a Token (dev only)
+
+In production, the Supabase JWT comes from your frontend login flow. Locally, since there is no UI, `generate_supabase_token.py` simulates it by calling `supabase.auth.sign_in_with_password()` directly and printing the resulting JWT so you can paste it into curl or LangGraph Studio.
 
 ## Prerequisites
 
