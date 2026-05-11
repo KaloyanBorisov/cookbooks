@@ -1,4 +1,0 @@
-crewai
-crewai[tools]
-httpx[socks]>=0.24.1
-socksio>=1.0.0
